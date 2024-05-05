@@ -243,7 +243,9 @@ defmodule PlausibleWeb.Api.ExternalStatsController do
   end
 
   defp find_event_only_filter(query) do
-    Map.keys(query.filters) |> Enum.find(&event_only_property?/1)
+    query.filters
+    |> Enum.map(fn {_op, prop, _value} -> prop end)
+    |> Enum.find(&event_only_property?/1)
   end
 
   defp event_only_property?("event:name"), do: true
@@ -335,7 +337,7 @@ defmodule PlausibleWeb.Api.ExternalStatsController do
     end)
   end
 
-  defp validate_filter(site, {"event:goal", {_type, goal_filter}}) do
+  defp validate_filter(site, {_type, "event:goal", goal_filter}) do
     configured_goals =
       Plausible.Goals.for_site(site)
       |> Enum.map(fn
@@ -358,7 +360,7 @@ defmodule PlausibleWeb.Api.ExternalStatsController do
     end
   end
 
-  defp validate_filter(_site, {property, _}) do
+  defp validate_filter(_site, {_, property, _}) do
     if Plausible.Stats.Props.valid_prop?(property) do
       :ok
     else

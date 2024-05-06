@@ -619,7 +619,7 @@ defmodule Plausible.Stats.Base do
     if :conversion_rate in metrics do
       include_imported = Keyword.fetch!(opts, :include_imported)
 
-      total_query = query |> Query.remove_event_filters([:goal, :props])
+      total_query = query |> Query.remove_filters(["event:goal", "event:props"])
 
       # :TRICKY: Subquery is used due to event:goal breakdown above doing an UNION ALL
       subquery(q)
